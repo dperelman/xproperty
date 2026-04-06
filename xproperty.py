@@ -28,18 +28,18 @@ def get_property(window, name):
     # strings should be served byte-wise
     assert property.format == 8;
     # string arrays are separated by \x00; some have one at the end as well
-    values = property.value.split('\x00')
-    return values
+    values = property.value.split(b'\x00')
+    return [v.decode('iso-8859-1') for v in values]
   else:
     raise NotImplementedError('I’m sorry, I can handle only STRINGs so far.')
 
 def set_property(window, name, values):
   property = atom_s2i(name)
   value = '\x00'.join(values)
-  window.change_property(property, atom_s2i('STRING'), 8, str(value))
+  window.change_property(property, atom_s2i('STRING'), 8, value.encode('iso-8859-1'))
  
 if __name__ == '__main__':
-  import sys, pipes
+  import sys, shlex
   root_window = display.screen().root
   l = len(sys.argv)
   if l <= 1:
@@ -49,6 +49,6 @@ if __name__ == '__main__':
     if l >= 3:
       set_property(root_window, property_name, sys.argv[2:])
     # a final get in any case
-    values = [pipes.quote(value) for value in
+    values = [shlex.quote(value) for value in
                 get_property(root_window, property_name)]
     print(property_name, *values)
