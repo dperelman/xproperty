@@ -5,12 +5,16 @@ import sys
 import shlex
 
 import Xlib.display
+import Xlib.error
 
 display = Xlib.display.Display()
 
 
 def atom_i2s(integer):
-    return display.get_atom_name(integer)
+    try:
+        return display.get_atom_name(integer)
+    except Xlib.error.BadAtom:
+        return f"<BadAtom {integer}>"
 
 
 def atom_s2i(string):
@@ -49,7 +53,7 @@ def get_property(window, name):
             property_type
     elif property_type == 'ATOM':
         assert property.format == 32
-        return [atom_i2s(v) for v in array.array('L', property.value)], \
+        return [atom_i2s(v) for v in array.array('I', property.value)], \
             property_type
     else:
         raise NotImplementedError('Unsupported property type: '
@@ -67,9 +71,9 @@ def set_property(window, name, values, property_type=None):
         window.change_property(property, atom_s2i(property_type), 8,
                                value.encode(encoding))
     elif property_type == 'ATOM':
-        window.change_property(property, atom_s2i('ATOM'), 32,
-                               array.array('L', [atom_s2i(v) for v in values])
-                               .tobytes())
+        a = array.array('I', [atom_s2i(v) for v in values])
+        b = a.tobytes()
+        window.change_property(property, atom_s2i('ATOM'), 32, b)
     else:
         raise NotImplementedError('Unsupported property type: '
                                   + property_type)
