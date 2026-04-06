@@ -3,35 +3,32 @@ xproperty
 
 [Xproperites on Wikipedia][xprop on wp]
 
-`xprop` can’t set STRING array properties. As I needed that capability to set
-_XKB_RULES_NAMES on the root window I wrote `xproperty`.
+`xprop` can’t set STRING/UTF8_STRING/ATOM array properties.
+`xproperty.py` handles just those, not trying to replicate the other
+functionality of `xprop`.
 
-Without editing of the source code it can get and set STRING properties and
-does so on the root window.
+```
+USAGE: xproperty.py WINDOW PROPERTY [TYPE] [VALUES...]
+
+    WINDOW is "-root" or a window id ("0x" prefixed for hex)
+    PROPERTY is the name of the property to get/set
+
+    The following arguments are for setting the property value:
+    TYPE is one of STRING, UTF8_STRING, ATOM, or AUTO. If AUTO,
+        the existing property type will be used.
+    VALUES are the new values to set the property to.
+```
+
+Examples:
 
     # get property (just give the name)
-    $ ./xproperty.py _XKB_RULES_NAMES
-    _XKB_RULES_NAMES evdev pc104 us altgr-intl ''
+    $ ./xproperty.py -root _XKB_RULES_NAMES
+    _XKB_RULES_NAMES(STRING) = evdev  pc104  us  altgr-intl
 
-Judging from the strings I have seen on my root window I can’t tell for sure
-if strings are supposed to be null-terminated or not. I guess it doesn’t really
-matter as long as the user of that string is written halfway sensible.
+    # set property to STRING array
+    $ ./xproperty.py -root _XKB_RULES_NAMES STRING evdev pc104 us altgr-intl
 
-To be able to see and set any string with `xproperty.py`, string arrays are set
-with null-byte as separator only. If you want to have the whole array null-
-terminated, add an empty argument.
-
-    # set property to STRING array (first argument is the name, the rest are
-    # the strings to set it to (one or more)
-    $ ./xproperty.py _XKB_RULES_NAMES evdev pc104 us altgr-intl
-    $ ./xproperty.py _XKB_RULES_NAMES evdev pc104 us altgr-intl ''
-
-The latter has an additional null-byte at the end 
-(to separate the following empty string). You can distinguish those with
-`xproperty.py`. For `xprop` both look the same:
-
-    $ xprop -root _XKB_RULES_NAMES
-    _XKB_RULES_NAMES(STRING) = "evdev", "pc104", "us", "altgr-intl"
-
+    # set property to array of existing type (UTF8_STRING in this case)
+    $ ./xproperty.py -root _NET_DESKTOP_NAMES AUTO "First Workspace" "Another"
 
 [xprop on wp]: http://en.wikipedia.org/wiki/X_Window_System_protocols_and_architecture#Attributes_and_properties
