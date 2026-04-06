@@ -89,7 +89,6 @@ def usage_and_exit():
 
 
 if __name__ == '__main__':
-    root_window = display.screen().root
     argc = len(sys.argv)
     if argc <= 2:
         usage_and_exit()
@@ -103,9 +102,9 @@ if __name__ == '__main__':
         property_name = sys.argv[2]
     if argc >= 4:
         type_str = sys.argv[3]
-        set_property(root_window, property_name, sys.argv[4:],
+        set_property(window, property_name, sys.argv[4:],
                      type_str if type_str != 'AUTO' else None)
     # a final get in any case
-    values, property_type = get_property(root_window, property_name)
+    values, property_type = get_property(window, property_name)
     print(f"{property_name}({property_type}) = "
           + f"{'  '.join([shlex.quote(value) for value in values])}")
