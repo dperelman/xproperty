@@ -1,7 +1,7 @@
 xproperty
 =========
 
-[Xproperites on Wikipedia][xprop on wp]
+[Xproperties on Wikipedia][xprop on wp]
 
 `xprop` can’t set STRING/UTF8_STRING/ATOM array properties.
 `xproperty.py` handles just those, not trying to replicate the other
